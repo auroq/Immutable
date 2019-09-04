@@ -8,10 +8,15 @@ The library should do the following:
 
 - Add a new item to the list
 - Remove an item from the list
-- Change the status of a todo list item
-  - Incomplete
-  - Progressing
-  - Complete
+- Perform actions on a task to change its status
+  - Actions
+    - start work
+    - stop work
+    - complete task
+  - Statuses
+    - Incomplete
+    - Progressing
+    - Complete
 
 All the relevant data structures (including the list of items) should be _immutable_.
 All operations should be without side effects.
