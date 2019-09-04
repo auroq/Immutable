@@ -21,6 +21,11 @@ description:         Please see the README on GitHub at <https://github.com/auro
 
 dependencies:
 - base >= 4.7 && < 5
+- hspec
+- validity
+- genvalidity
+- genvalidity-hspec
+
 
 library:
   source-dirs: src
