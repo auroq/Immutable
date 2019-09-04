@@ -1,15 +1,35 @@
 module Task
   ( Task(..)
+  , Status(..)
+  , Progress(..)
   , newTask
-  , addSubTask
   ) where
 
-data Task = Task { name :: String
-                 , subTasks :: [Task]
+data Status = Incomplete | Progressing | Complete deriving (Show, Ord, Eq)
+
+data Task = Task { status :: Status
+                 , name :: String
                  } deriving (Show, Ord, Eq)
 
-newTask :: String -> Task
-newTask name = Task name []
+class Progress a where
+  isStatus :: Status -> a -> Bool
+  getStatus :: a -> Status
+  start :: a -> a
+  stop :: a -> a
+  complete :: a -> a
+  isStatus status a = getStatus a == status
 
-addSubTask :: String -> Task -> Task
-addSubTask newTaskName (Task name subTasks) = Task name $ newTask newTaskName : subTasks
+instance Progress Task where
+  getStatus (Task status _) = status
+
+  start (Task Incomplete name) = Task Progressing name
+  start task                   = task
+
+  stop (Task Progressing name) = Task Incomplete name
+  stop task                    = task
+
+  complete task = Task Complete $ name task
+
+
+newTask :: String -> Task
+newTask = Task Incomplete

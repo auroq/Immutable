@@ -4,22 +4,42 @@ import Task
 import Test.Hspec
 import Test.Validity
 
+
+testGetStatus status = do
+  context ("when task is " ++ show status) $ do
+    it ("should be " ++ show status) $ do
+      getStatus (Task status "testTask") `shouldBe` status
+
+testChangingStatus currentStatus action expectedStatus = do
+  context ("when task is " ++ show currentStatus) $ do
+    let task = Task currentStatus "task name"
+    it ("should be " ++ show expectedStatus) $ do 
+      getStatus (action task) `shouldBe` expectedStatus
+
 spec :: Spec
 spec = do
-  describe "when creating a new task" $ do
+  describe"getting status" $ do
+    testGetStatus Incomplete
+    testGetStatus Progressing
+    testGetStatus Complete
+
+  describe "creating a new task" $ do
     it "should return a named task" $ do
       name (newTask "task name") `shouldBe` "task name"
-    it "should have no subtasks" $ do
-      subTasks (newTask "task name") `shouldBe` []
-
-  describe "when adding a subtask to a new task" $ do
-    let task = addSubTask "subtask 1" $ newTask "test task"
-    it "should contain the subtask" $ do
-      subTasks task `shouldBe` [Task "subtask 1" []]
+    it "should return an incomplete task" $ do
+      status (newTask "task name") `shouldBe` Incomplete
   
-  describe "when adding a subtask to a task with subtasks" $ do
-      let task = addSubTask "subtask 2" $ addSubTask "subtask 1"  $ newTask "test task" 
-      it "should contain the subtask" $ do
-        head  (subTasks task) `shouldBe` Task "subtask 2" []
-      it "should not modify the existing items" $ do
-        tail (subTasks task) `shouldBe` [Task "subtask 1" []]
+  describe "starting a task" $ do
+    testChangingStatus Incomplete (start) Progressing
+    testChangingStatus Progressing (start) Progressing
+    testChangingStatus Complete (start) Complete
+
+  describe "stopping a task" $ do
+    testChangingStatus Incomplete (stop) Incomplete
+    testChangingStatus Progressing (stop) Incomplete
+    testChangingStatus Complete (stop) Complete
+
+  describe "completing a task" $ do
+    testChangingStatus Incomplete (complete) Complete
+    testChangingStatus Progressing (complete) Complete
+    testChangingStatus Complete (complete) Complete
